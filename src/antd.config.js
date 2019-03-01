@@ -1,8 +1,13 @@
 import Vue from 'vue'
 import { Row, Col, Card, Button, Form, Input, Icon, Layout, Menu, Radio,
   Tabs, Tooltip, Table, Spin, Dropdown, Checkbox, Select, Switch, DatePicker,
-  TimePicker, LocaleProvider, Tag, Drawer, Steps, Upload, Alert } from 'ant-design-vue'
+  TimePicker, LocaleProvider, Tag, Drawer, Steps, Upload, Alert, notification,
+  Modal } from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
+
+Vue.prototype.$notification = notification
+Vue.prototype.$confirm = Modal.confirm
+Vue.prototype.$warning = Modal.warning
 
 Vue.use(Row)
 Vue.use(Col)
@@ -30,3 +35,4 @@ Vue.use(Drawer)
 Vue.use(Steps)
 Vue.use(Upload)
 Vue.use(Alert)
+Vue.use(Modal)

@@ -25,7 +25,7 @@
       </a-dropdown>
       <a-dropdown class="header-item" :disabled="fwUpdateState">
         <span class="header-user" >
-          <a-icon type="user" style="margin-right: 5px"/>Admin
+          <a-icon type="user" style="margin-right: 5px"/>{{userName}}
         </span>
         <a-menu slot="overlay">
           <a-menu-item key="modify"><a-icon type="edit" />{{$t('message.common.edit_profile')}}</a-menu-item>
@@ -43,7 +43,9 @@ export default {
   name: 'topbar',
   data () {
     return {
-      collapsed: false
+      collapsed: false,
+      userName: localStorage.getItem('username')
+
     }
   },
   computed: {

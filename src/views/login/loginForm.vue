@@ -3,26 +3,19 @@
     <a-row>
       <a-col :xl="7" :xxl="6" :offset="9" style="margin-top: 3%">
         <a-card style="opacity: 0.9" :title="$t('message.common.title')" :bordered=false :headStyle="cardTitleStyle">
-          <a-form :form="formData" id='components-form-demo-normal-login' @submit="onLogin" class='login-form'>
-            <a-form-item hasFeedback>
+          <a-form id='components-form-demo-normal-login'>
+            <a-form-item :validate-status="userNameError" :help="userNameMsg" has-feedback>
               <a-input
-                :placeholder="$t('message.signin.username')"
-                v-decorator="[
-                  'userName',
-                  { rules: [{ required: true, message: 'Please input your username!' }] }
-                ]"
+                :placeholder="$t('message.signin.username')" v-model="userName"
                 >
                 <a-icon slot="prefix" type='user' style="color: rgba(0,0,0,.25)" />
               </a-input>
             </a-form-item>
-            <a-form-item hasFeedback>
+            <a-form-item hasFeedback :validate-status="userPswError" :help="userPswMsg">
               <a-input
-                v-decorator="[
-                  'password',
-                  { rules: [{ required: true, message: 'Please input your Password!' }] }
-                ]"
-                type='password'
+                type='password' v-model="userPsw"
                 :placeholder="$t('message.signin.psw')"
+                @keyup.native.enter="submit"
                 >
                 <a-icon slot="prefix" type='lock' style="color: rgba(0,0,0,.25)" />
               </a-input>
@@ -34,7 +27,7 @@
               </a-radio-group>
             </a-form-item>
             <a-form-item>
-              <a-button type='primary' htmlType='submit' style='width: 100%'>
+              <a-button type='primary' @click='submit' style='width: 100%' :loading="loadingFlag">
                 {{$t('message.signin.signin')}}
               </a-button>
             </a-form-item>
@@ -46,12 +39,18 @@
 </template>
 
 <script>
+// import errorHandler, { LOGIN } from '@/service/api'
+
 export default {
   name: 'loginForm',
   data () {
     return {
-      formData: this.$form.createForm(this),
+      userName: undefined,
+      userPsw: undefined,
+      userNameError: '',
+      userPswError: '',
       lang: '',
+      loadingFlag: false,
       cardTitleStyle: {
         textAlign: 'center',
         fontSize: '1.5em'
@@ -71,20 +70,69 @@ export default {
       localStorage.setItem('lang', this.lang)
       this.$i18n.locale = this.lang
       document.title = this.$t('message.common.title')
+    },
+
+    userName (val) {
+      if (val) {
+        this.userNameError = 'success'
+      } else {
+        this.userNameError = 'error'
+      }
+    },
+
+    userPsw (val) {
+      if (val) {
+        this.userPswError = 'success'
+      }
+    }
+  },
+  computed: {
+    userNameMsg () {
+      if (this.userNameError === 'error') {
+        return this.$t('message.signin.empty_user_err')
+      } else {
+        return ''
+      }
+    },
+
+    userPswMsg () {
+      if (this.userPswError === 'error') {
+        return this.$t('message.signin.empty_psw_err')
+      } else {
+        return ''
+      }
     }
   },
   methods: {
-    onLogin (e) {
+    submit (e) {
       e.preventDefault()
-      this.formData.validateFields((err, values) => {
-        this.$router.push({ path: '/system-info' })
-        if (!err) {
-          console.log('Received values of form: ', values)
-        }
-      })
+      if (!this.userName) {
+        this.userNameError = 'error'
+      }
+      if (!this.userPsw) {
+        this.userPswError = 'error'
+      }
+
+      if (this.userName && this.userPsw) {
+        let data = [this.userName, this.userPsw]
+
+        this.onLogin(data)
+      }
     },
-    reset (e) {
-      this.formData.resetFields()
+    async onLogin (data) {
+    //   this.loadingFlag = true
+    //   try {
+    //     await LOGIN({ data })
+    //     this.loadingFlag = false
+    //     localStorage.setItem('username', this.userName)
+    //     this.$router.push({ path: '/dashboard' })
+    //   } catch (error) {
+    //     errorHandler(this, error, this.$t('message.signin.login_err_msg'))
+    //     this.loadingFlag = false
+    //   }
+    // }
+      localStorage.setItem('username', this.userName)
+      this.$router.push({ path: '/system-info' })
     }
   }
 }

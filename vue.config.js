@@ -12,9 +12,23 @@ module.exports = {
     port: 23333,
     public: '0.0.0.0:23333',
     proxy: {
-      '/api': {
-        target: 'http://10.42.0.1:3333',
-        pathRewrite: { '^/api': '' }
+      '/redfish': {
+        target: 'https://ilorestfulapiexplorer.ext.hpe.com',
+        ws: true,
+        secure: false,
+        cookieDomainRewrite: 'localhost',
+        debug: true,
+        /* http <-> https 取消secure标志，是浏览器可以储存cookie  */
+        onProxyRes: (proxyRes) => {
+          let removeSecure = str => str.replace(/; Secure/i, '')
+          let set = proxyRes.headers['set-cookie']
+          if (set) {
+            let result = Array.isArray(set)
+              ? set.map(removeSecure)
+              : removeSecure(set)
+            proxyRes.headers['set-cookie'] = result
+          }
+        }
       }
     }
   },

@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import RefreshSate from './refresh'
 import LangState from './language'
 import FwUpdateState from './fwUpdateState'
+import RedfishState from './redfishURL'
 
 Vue.use(Vuex)
 
@@ -12,6 +13,7 @@ export default new Vuex.Store({
   modules: {
     RefreshSate,
     LangState,
-    FwUpdateState
+    FwUpdateState,
+    RedfishState
   }
 })

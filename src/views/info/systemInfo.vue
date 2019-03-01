@@ -2,17 +2,17 @@
   <view-content message="sysInfo" @refresh="refresh">
     <a-tabs tabPosition="left">
       <a-tab-pane :tab="$t('message.sysInfo.cpu')" key="cpu">
-        <cpu-info></cpu-info>
+        <cpu-info :cpuInfo="cpuInfo"></cpu-info>
       </a-tab-pane>
       <a-tab-pane :tab="$t('message.sysInfo.mem')" key="mem">
-        <mem-info></mem-info>
+        <mem-info :memInfo="memInfo"></mem-info>
       </a-tab-pane>
-      <a-tab-pane :tab="$t('message.sysInfo.psu')" key="psu">
+      <!-- <a-tab-pane :tab="$t('message.sysInfo.psu')" key="psu">
         <psu-info></psu-info>
       </a-tab-pane>
       <a-tab-pane :tab="$t('message.sysInfo.fan')" key="fan">
         <fan-info></fan-info>
-      </a-tab-pane>
+      </a-tab-pane> -->
     </a-tabs>
   </view-content>
 </template>
@@ -28,11 +28,11 @@ import FanInfo from './components/fanInfo'
 
 export default {
   name: 'systemInfo',
-  created () {
-    this.refresh()
-  },
   data () {
-    return {}
+    return {
+      cpuInfo: [],
+      memInfo: []
+    }
   },
   methods: {
     ...mapMutations(['setRefreshFlag']),

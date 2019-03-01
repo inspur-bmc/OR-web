@@ -5,6 +5,9 @@ import LoginRoute from './views/login/route'
 import InformationRoute from './views/info/route'
 import FanCtrRoute from './views/fan/route'
 import RedfishRoute from './views/redfish/route'
+import SensorRoute from './views/sensor/route'
+import FwUpdateRoute from './views/fwUpdate/route'
+import NodeInfoRoute from './views/node/route'
 
 Vue.use(Router)
 
@@ -15,6 +18,9 @@ export default new Router({
     ...LoginRoute,
     ...InformationRoute,
     ...FanCtrRoute,
-    ...RedfishRoute
+    ...RedfishRoute,
+    ...SensorRoute,
+    ...FwUpdateRoute,
+    ...NodeInfoRoute
   ]
 })

@@ -5,6 +5,8 @@ import FruMsg from './fru'
 import FanCtrlMsg from './fanCtrl'
 import FwUpdateMsg from './fwUpdate'
 import RedfishMsg from './redfish'
+import SensorMsg from './sensor'
+import NodeMsg from './node'
 
 export default {
   message: {
@@ -14,6 +16,8 @@ export default {
     fru: FruMsg,
     fanCtrl: FanCtrlMsg,
     fwUpdate: FwUpdateMsg,
-    redfish: RedfishMsg
+    redfish: RedfishMsg,
+    sensor: SensorMsg,
+    node: NodeMsg
   }
 }

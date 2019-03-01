@@ -3,7 +3,7 @@
     :trigger="null"
     collapsible
     v-model="collapsed"
-    width="250"
+    width="200"
     >
     <a-menu theme="dark" mode="inline"
       :openKeys="openKeys"
@@ -19,14 +19,29 @@
           <span>{{$t('message.common.fruInfo')}}</span>
         </router-link>
       </a-menu-item>
+      <a-menu-item key="nodeInfo" :disabled="fwUpdateState">
+        <router-link to="node-info"><a-icon type="hdd" />
+          <span>{{$t('message.common.nodeInfo')}}</span>
+        </router-link>
+      </a-menu-item>
+      <a-menu-item key="sensor" :disabled="fwUpdateState">
+        <router-link to="sensor"><a-icon type="bars" />
+          <span>{{$t('message.common.sensorInfo')}}</span>
+        </router-link>
+      </a-menu-item>
       <a-menu-item key="fanCtrl" :disabled="fwUpdateState">
         <router-link to="fan-controller"><span class="iconfont icon-fan" />
           <span>{{$t('message.common.fan_controller')}}</span>
         </router-link>
       </a-menu-item>
+      <a-menu-item key="fwUpdate" :disabled="fwUpdateState">
+        <router-link to="firmware-update"><a-icon type="upload" />
+          <span>{{$t('message.common.firmware_update')}}</span>
+        </router-link>
+      </a-menu-item>
       <a-menu-item key="redfish" :disabled="fwUpdateState">
         <router-link to="redfish"><span class="iconfont icon-Fish" />
-          <span>{{$t('message.common.fan_controller')}}</span>
+          <span>Redfish</span>
         </router-link>
       </a-menu-item>
     </a-menu>
