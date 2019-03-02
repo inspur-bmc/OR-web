@@ -39,7 +39,7 @@
 </template>
 
 <script>
-// import errorHandler, { LOGIN } from '@/service/api'
+import errorHandler, { LOGIN } from '@/service/api'
 
 export default {
   name: 'loginForm',
@@ -114,25 +114,25 @@ export default {
       }
 
       if (this.userName && this.userPsw) {
-        let data = [this.userName, this.userPsw]
+        let data = {
+          UserName: this.userName,
+          Password: this.userPsw
+        }
 
         this.onLogin(data)
       }
     },
     async onLogin (data) {
-    //   this.loadingFlag = true
-    //   try {
-    //     await LOGIN({ data })
-    //     this.loadingFlag = false
-    //     localStorage.setItem('username', this.userName)
-    //     this.$router.push({ path: '/dashboard' })
-    //   } catch (error) {
-    //     errorHandler(this, error, this.$t('message.signin.login_err_msg'))
-    //     this.loadingFlag = false
-    //   }
-    // }
-      localStorage.setItem('username', this.userName)
-      this.$router.push({ path: '/system-info' })
+      this.loadingFlag = true
+      try {
+        await LOGIN(data)
+        this.loadingFlag = false
+        localStorage.setItem('username', this.userName)
+        this.$router.push({ path: '/sensor' })
+      } catch (error) {
+        errorHandler(this, error, this.$t('message.signin.login_err_msg'))
+        this.loadingFlag = false
+      }
     }
   }
 }

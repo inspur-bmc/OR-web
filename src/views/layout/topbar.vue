@@ -79,6 +79,7 @@ export default {
 
     /* 注销 */
     signOut (ob) {
+      localStorage.clear()
       this.$router.push({ path: 'login' })
     }
   }

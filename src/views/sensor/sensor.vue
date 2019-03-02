@@ -1,6 +1,17 @@
 <template>
   <view-content message="sensor" @refresh="refresh">
     <a-row style="margin-bottom: 20px">
+      <a-form>
+        <a-col :span="24">
+          <a-form-item :label="$t('message.common.select_node')" :labelCol="{ span: 3 }" :wrapperCol="{ span: 4 }">
+            <a-select v-model="node" @change="onChassisChange">
+              <a-select-option v-for="(item, index) in nodeList" :key="index" :value="item">{{item}}</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+      </a-form>
+    </a-row>
+    <a-row style="margin-bottom: 20px">
       <a-col :span="24">
         <a-table :columns="columns" :dataSource="parsedData" size="small" rowKey='id'>
           <div slot="filterDropdown" slot-scope="{ setSelectedKeys, selectedKeys, confirm, clearFilters }" class='custom-filter-dropdown'>
@@ -79,13 +90,18 @@
 import ViewContent from '@/components/viewContent'
 import { mapMutations } from 'vuex'
 
-import errorHandler, { getSensorInfo } from '@/service/api'
-import { parseSensorData } from '@/service/utils/'
+import http from '@/service/api/http'
+import errorHandler, { getChassisInfo } from '@/service/api'
+// import { parseSensorData } from '@/service/utils/'
 
 export default {
   name: 'sensor',
   data () {
     return {
+      node: undefined,
+      nodeList: [],
+      chassisReqs: {},
+      currentChassisInfo: {},
       scaleList: ['Value', 'WarningLow', 'WarningHigh', 'CriticalLow', 'CriticalHigh'],
       searchText: '',
       searchInput: null,
@@ -96,14 +112,14 @@ export default {
       },
       columns: [
         { title: this.$t('message.sensor.thead_sensor'),
-          dataIndex: 'title',
+          dataIndex: 'name',
           width: 250,
           scopedSlots: {
             filterDropdown: 'filterDropdown',
             filterIcon: 'filterIcon',
             customRender: 'searchTitle'
           },
-          onFilter: (value, record) => record.title.toLowerCase().includes(value.toLowerCase()),
+          onFilter: (value, record) => record.name.toLowerCase().includes(value.toLowerCase()),
           onFilterDropdownVisibleChange: (visible) => {
             if (visible) {
               setTimeout(() => {
@@ -113,7 +129,7 @@ export default {
           }
         },
         { title: this.$t('message.sensor.thead_status'),
-          dataIndex: 'status',
+          dataIndex: 'healthStatus',
           align: 'center',
           scopedSlots: { customRender: 'status' },
           filters: [{
@@ -129,10 +145,10 @@ export default {
           onFilter: (value, record) => record.status.indexOf(value) === 0
         },
         { title: this.$t('message.sensor.thead_current_reading'), dataIndex: 'Value', align: 'center', scopedSlots: { customRender: 'Value' } },
-        { title: this.$t('message.sensor.thead_low_warning'), dataIndex: 'WarningLow', align: 'center', scopedSlots: { customRender: 'WarningLow' } },
-        { title: this.$t('message.sensor.thead_high_warning'), dataIndex: 'WarningHigh', align: 'center', scopedSlots: { customRender: 'WarningHigh' } },
+        { title: this.$t('message.sensor.thead_min_reading'), dataIndex: 'minReading', align: 'center', scopedSlots: { customRender: 'WarningLow' } },
+        { title: this.$t('message.sensor.thead_max_reading'), dataIndex: 'maxReading', align: 'center', scopedSlots: { customRender: 'WarningHigh' } },
         { title: this.$t('message.sensor.thead_low_critical'), dataIndex: 'CriticalLow', align: 'center', scopedSlots: { customRender: 'CriticalLow' } },
-        { title: this.$t('message.sensor.thead_high_critical'), dataIndex: 'CriticalHigh', align: 'center', scopedSlots: { customRender: 'CriticalHigh' } }
+        { title: this.$t('message.sensor.thead_high_critical'), dataIndex: 'CriticalUpper', align: 'center', scopedSlots: { customRender: 'CriticalHigh' } }
       ],
       parsedData: []
     }
@@ -140,14 +156,99 @@ export default {
   methods: {
     ...mapMutations(['setRefreshFlag']),
     async refresh () {
+      this.nodeList = []
+      this.chassisReqs = {}
       try {
-        this.sensorData = await getSensorInfo()
+        let resChassis = await getChassisInfo()
+        resChassis.data.Members.forEach((item) => {
+          let tmps = item['@odata.id'].split('/')
+          let name = tmps[tmps.length - 1]
+          this.nodeList.push(name)
+          this.chassisReqs[name] = [`/redfish/v1/Chassis/${name}/Power`, `/redfish/v1/Chassis/${name}/Thermal`]
+        })
+        this.node = this.nodeList[0]
+        let resSplit = await Promise.all([
+          http('get', this.chassisReqs[this.node][0]),
+          http('get', this.chassisReqs[this.node][1])
+        ])
+
+        this.currentChassisInfo = {
+          power: resSplit[0].data,
+          thermal: resSplit[1].data
+        }
       } catch (error) {
         errorHandler(this, error, this.$t('message.sensor.get_err_msg'))
       }
 
       this.setRefreshFlag({ refreshFlag: false })
-      this.parsedData = parseSensorData(this.sensorData)
+      this.parsedData = this.parseData(this.currentChassisInfo)
+    },
+
+    // chassis变化回调函数
+    async onChassisChange (val) {
+      try {
+        this.node = val
+        let resSplit = await Promise.all([
+          http('get', this.chassisReqs[this.node][0]),
+          http('get', this.chassisReqs[this.node][1])
+        ])
+
+        this.currentChassisInfo = {
+          power: resSplit[0].data,
+          thermal: resSplit[1].data
+        }
+      } catch (error) {
+        errorHandler(this, error, this.$t('message.sensor.get_err_msg'))
+      }
+    },
+
+    // 解析数据
+    parseData (content) {
+      let res = []
+
+      content.power.Voltages.forEach((item) => {
+        res.push({
+          name: item.Name,
+          healthStatus: item.Status.Health,
+          enableStatus: item.Status.State,
+          reading: item.ReadingVolts.toFixed(2),
+          criticalLow: item.LowerThresholdCritical.toFixed(2),
+          criticalUpper: item.UpperThresholdCritical.toFixed(2),
+          minReading: item.MinReadingRange,
+          maxReading: item.MaxReadingRange,
+          type: 'voltage'
+        })
+      })
+
+      content.thermal.Fans.forEach((item) => {
+        res.push({
+          name: item.Name,
+          healthStatus: item.Status.Health,
+          enableStatus: item.Status.State,
+          reading: item.Reading.toFixed(2),
+          criticalLow: item.LowerThresholdCritical ? item.LowerThresholdCritical.toFixed(2) : '--',
+          criticalUpper: item.UpperThresholdCritical ? item.UpperThresholdCritical.toFixed(2) : '--',
+          minReading: item.MinReadingRange,
+          maxReading: item.MaxReadingRange,
+          type: item.ReadingUnits
+        })
+      })
+
+      content.thermal.Temperatures.forEach((item) => {
+        res.push({
+          name: item.Name,
+          healthStatus: item.Status.Health,
+          enableStatus: item.Status.State,
+          reading: item.ReadingCelsius.toFixed(2),
+          criticalLow: item.LowerThresholdCritical ? item.LowerThresholdCritical.toFixed(2) : '--',
+          criticalUpper: item.UpperThresholdCritical ? item.UpperThresholdCritical.toFixed(2) : '--',
+          minReading: item.MinReadingRangeTemp,
+          maxReading: item.MaxReadingRangeTemp,
+          type: 'temperature'
+        })
+      })
+
+      return res
     },
 
     // 搜索传感器名称

@@ -12,8 +12,8 @@ module.exports = {
     port: 23333,
     public: '0.0.0.0:23333',
     proxy: {
-      '/redfish': {
-        target: 'https://ilorestfulapiexplorer.ext.hpe.com',
+      '/redfish/v1': {
+        target: 'https://100.2.76.178',
         ws: true,
         secure: false,
         cookieDomainRewrite: 'localhost',

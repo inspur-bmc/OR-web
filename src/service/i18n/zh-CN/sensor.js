@@ -13,6 +13,8 @@ export default {
   thead_high_warning: '警告高阈',
   thead_low_critical: '严重低阈',
   thead_high_critical: '严重高阈',
+  thead_min_reading: '最低读数',
+  thead_max_reading: '最高读数',
   search_placeholder: '传感器名称',
 
   get_err_msg: '无法获取传感器读数',

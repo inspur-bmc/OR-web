@@ -2,11 +2,15 @@ import axios from 'axios'
 
 // 创建axios的一个实例
 let http = axios.create({
-  timeout: 6000
+  timeout: 10000
 })
 
 // 请求拦截器
 http.interceptors.request.use(function (config) {
+  if (config.url !== '/redfish/v1/SessionService/Sessions') {
+    config.headers['x-auth-token'] = localStorage.getItem('token')
+  }
+  // console.log(config.headers)
   return config
 }, function (error) {
   return Promise.reject(error)
@@ -14,7 +18,11 @@ http.interceptors.request.use(function (config) {
 
 // 响应拦截器
 http.interceptors.response.use(function (response) {
-  return response.data
+  if (response.headers['x-auth-token']) {
+    localStorage.setItem('token', response.headers['x-auth-token'])
+  }
+
+  return response
 }, function (error) {
   return Promise.reject(error)
 })

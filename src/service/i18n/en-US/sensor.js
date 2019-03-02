@@ -13,6 +13,8 @@ export default {
   thead_high_warning: 'High Warning',
   thead_low_critical: 'Low Critical',
   thead_high_critical: 'High Critical',
+  thead_min_reading: 'Min Reading',
+  thead_max_reading: 'Max Reading',
   search_placeholder: 'Sensor Name',
 
   get_err_msg: 'Fail to get sensor data',
