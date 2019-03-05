@@ -13,7 +13,7 @@
     </a-row>
     <a-row style="margin-bottom: 20px">
       <a-col :span="24">
-        <a-table :columns="columns" :dataSource="parsedData" size="small" rowKey='id'>
+        <a-table :columns="columns" :dataSource="parsedData" size="small" rowKey='name'>
           <div slot="filterDropdown" slot-scope="{ setSelectedKeys, selectedKeys, confirm, clearFilters }" class='custom-filter-dropdown'>
             <a-input
               v-ant-ref="c => searchInput = c"
@@ -47,25 +47,25 @@
             <template v-else>{{text}}</template>
           </template>
           <span slot="status" slot-scope="status">
-            <a-icon v-if="status == 'normal'" type="check-circle" style="color: green;font-size: 1.2em;"/>
+            <a-icon v-if="status == 'OK'" type="check-circle" style="color: green;font-size: 1.2em;"/>
             <a-icon v-else-if="status == 'warning'" type="warning" style="color: orange;font-size: 1.2em;"/>
             <span v-else class="iconfont icon-radioactive" style="color: red;font-size: 1.2em;"/>
           </span>
           <!-- eslint-disable-next-line vue/no-parsing-error -->
           <div v-for="(item, index) in scaleList" :key="index" :slot="item" slot-scope="value, record">
-            <span v-if="record.unit == 'C'">
+            <span v-if="record.type == 'temperature'">
               {{value + ' ℃'}}
             </span>
-            <span v-else-if="record.unit == 'volts'">
+            <span v-else-if="record.type == 'voltage'">
               {{value + ' V'}}
             </span>
-            <span v-else-if="record.unit == 'rpms'">
+            <span v-else-if="record.type == 'RPM'">
               {{value + ' rpm'}}
             </span>
-            <span v-else-if="record.unit == 'watts'">
+            <span v-else-if="record.type == 'watts'">
               {{value + ' W'}}
             </span>
-            <span v-else-if="record.unit == 'amperes'">
+            <span v-else-if="record.type == 'amperes'">
               {{value + ' A'}}
             </span>
           </div>
@@ -102,7 +102,7 @@ export default {
       nodeList: [],
       chassisReqs: {},
       currentChassisInfo: {},
-      scaleList: ['Value', 'WarningLow', 'WarningHigh', 'CriticalLow', 'CriticalHigh'],
+      scaleList: ['reading', 'minReading', 'maxReading', 'criticalLow', 'criticalUpper'],
       searchText: '',
       searchInput: null,
       sensorData: {},
@@ -142,13 +142,13 @@ export default {
             text: this.$t('message.sensor.critical'),
             value: 'critical'
           }],
-          onFilter: (value, record) => record.status.indexOf(value) === 0
+          onFilter: (value, record) => record.healthStatus.indexOf(value) === 0
         },
-        { title: this.$t('message.sensor.thead_current_reading'), dataIndex: 'Value', align: 'center', scopedSlots: { customRender: 'Value' } },
-        { title: this.$t('message.sensor.thead_min_reading'), dataIndex: 'minReading', align: 'center', scopedSlots: { customRender: 'WarningLow' } },
-        { title: this.$t('message.sensor.thead_max_reading'), dataIndex: 'maxReading', align: 'center', scopedSlots: { customRender: 'WarningHigh' } },
-        { title: this.$t('message.sensor.thead_low_critical'), dataIndex: 'CriticalLow', align: 'center', scopedSlots: { customRender: 'CriticalLow' } },
-        { title: this.$t('message.sensor.thead_high_critical'), dataIndex: 'CriticalUpper', align: 'center', scopedSlots: { customRender: 'CriticalHigh' } }
+        { title: this.$t('message.sensor.thead_current_reading'), dataIndex: 'reading', align: 'center', scopedSlots: { customRender: 'reading' } },
+        { title: this.$t('message.sensor.thead_min_reading'), dataIndex: 'minReading', align: 'center', scopedSlots: { customRender: 'minReading' } },
+        { title: this.$t('message.sensor.thead_max_reading'), dataIndex: 'maxReading', align: 'center', scopedSlots: { customRender: 'maxReading' } },
+        { title: this.$t('message.sensor.thead_low_critical'), dataIndex: 'criticalLow', align: 'center', scopedSlots: { customRender: 'criticalLow' } },
+        { title: this.$t('message.sensor.thead_high_critical'), dataIndex: 'criticalUpper', align: 'center', scopedSlots: { customRender: 'criticalUpper' } }
       ],
       parsedData: []
     }
@@ -200,6 +200,9 @@ export default {
       } catch (error) {
         errorHandler(this, error, this.$t('message.sensor.get_err_msg'))
       }
+
+      this.parsedData = []
+      this.parsedData = this.parseData(this.currentChassisInfo)
     },
 
     // 解析数据
@@ -211,11 +214,11 @@ export default {
           name: item.Name,
           healthStatus: item.Status.Health,
           enableStatus: item.Status.State,
-          reading: item.ReadingVolts.toFixed(2),
-          criticalLow: item.LowerThresholdCritical.toFixed(2),
-          criticalUpper: item.UpperThresholdCritical.toFixed(2),
-          minReading: item.MinReadingRange,
-          maxReading: item.MaxReadingRange,
+          reading: item.ReadingVolts,
+          criticalLow: item.LowerThresholdCritical || '--',
+          criticalUpper: item.UpperThresholdCritical || '--',
+          minReading: item.MinReadingRange || '--',
+          maxReading: item.MaxReadingRange || '--',
           type: 'voltage'
         })
       })
@@ -228,8 +231,8 @@ export default {
           reading: item.Reading.toFixed(2),
           criticalLow: item.LowerThresholdCritical ? item.LowerThresholdCritical.toFixed(2) : '--',
           criticalUpper: item.UpperThresholdCritical ? item.UpperThresholdCritical.toFixed(2) : '--',
-          minReading: item.MinReadingRange,
-          maxReading: item.MaxReadingRange,
+          minReading: item.MinReadingRange || '--',
+          maxReading: item.MaxReadingRange || '--',
           type: item.ReadingUnits
         })
       })
@@ -242,8 +245,8 @@ export default {
           reading: item.ReadingCelsius.toFixed(2),
           criticalLow: item.LowerThresholdCritical ? item.LowerThresholdCritical.toFixed(2) : '--',
           criticalUpper: item.UpperThresholdCritical ? item.UpperThresholdCritical.toFixed(2) : '--',
-          minReading: item.MinReadingRangeTemp,
-          maxReading: item.MaxReadingRangeTemp,
+          minReading: item.MinReadingRang || '--',
+          maxReading: item.MaxReadingRange || '--',
           type: 'temperature'
         })
       })

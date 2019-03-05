@@ -29,11 +29,11 @@
           <span>{{$t('message.common.sensorInfo')}}</span>
         </router-link>
       </a-menu-item>
-      <a-menu-item key="fanCtrl" :disabled="fwUpdateState">
+      <!-- <a-menu-item key="fanCtrl" :disabled="fwUpdateState">
         <router-link to="fan-controller"><span class="iconfont icon-fan" />
           <span>{{$t('message.common.fan_controller')}}</span>
         </router-link>
-      </a-menu-item>
+      </a-menu-item> -->
       <a-menu-item key="fwUpdate" :disabled="fwUpdateState">
         <router-link to="firmware-update"><a-icon type="upload" />
           <span>{{$t('message.common.firmware_update')}}</span>

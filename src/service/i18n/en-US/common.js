@@ -21,5 +21,8 @@ export default {
   fruInfo: 'FRU Info',
   nodeInfo: 'Node Info',
   select_node: 'Select Node',
-  firmware_update: 'Firmware Update'
+  firmware_update: 'Firmware Update',
+  power_on: 'Power On',
+  power_off: 'Power Off',
+  reboot: 'Reboot'
 }

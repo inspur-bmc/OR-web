@@ -1,132 +1,112 @@
 <template>
-  <div>
-    <a-row>
-      <a-col :span="24">
-        <h1 class="view-title">{{$t('message.fru.title')}}</h1>
-        <span style="color: #9E9E9E">{{$t('message.fru.sub_title')}}</span>
-        <a-tooltip placement="top" >
-          <template slot="title">
-            <span>{{$t('message.common.help')}}</span>
-          </template>
-          <span class="help-mark"><a-icon type="question-circle" @click="toggleHelp"/></span>
-        </a-tooltip>
-      </a-col>
+  <view-content message="fru" @refresh="refresh">
+    <a-row style="margin-bottom: 20px">
+      <a-form>
+        <a-col :span="24">
+          <a-form-item :label="$t('message.common.select_node')" :labelCol="{ span: 3 }" :wrapperCol="{ span: 4 }">
+            <a-select v-model="node" @change="onChassisChange">
+              <a-select-option v-for="(item, index) in nodeList" :key="index" :value="item">{{item}}</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+      </a-form>
     </a-row>
-    <help-card :helpFlag="helpFlag">{{$t('message.fru.helpMsg')}}</help-card>
-    <a-row :gutter="16">
-      <a-col :span="8">
-        <a-card :bordered="false" :loading="refreshFlag" :title="$t('message.fru.chassis')">
-          <a-row class="item-row">
-            <a-col :span="12"><span class="content-label">{{$t('message.fru.chassis_type')}}</span></a-col>
-            <a-col :span="12"><span class="courier-bold">Switch</span></a-col>
-          </a-row>
-          <a-row class="item-row">
-            <a-col :span="12"><span class="content-label">{{$t('message.fru.chassis_partno')}}</span></a-col>
-            <a-col :span="12"><span class="courier-bold">{{chassisInfo.PartNumber}}</span></a-col>
-          </a-row>
-          <a-row class="item-row">
-            <a-col :span="12"><span class="content-label">{{$t('message.fru.chassis_serialno')}}</span></a-col>
-            <a-col :span="12"><span class="courier-bold">{{chassisInfo.SerialNumber}}</span></a-col>
-          </a-row>
-        </a-card>
-      </a-col>
-      <a-col :span="8">
-        <a-card :bordered="false" :loading="refreshFlag" :title="$t('message.fru.board')">
-          <a-row class="item-row">
-            <a-col :span="12"><span class="content-label">{{$t('message.fru.manufacture_datetime')}}</span></a-col>
-            <a-col :span="12"><span class="courier-bold">{{boardInfo.BuildDate}}</span></a-col>
-          </a-row>
-          <a-row class="item-row">
-            <a-col :span="12"><span class="content-label">{{$t('message.fru.board_manufac')}}</span></a-col>
-            <a-col :span="12"><span class="courier-bold">{{boardInfo.Manufacturer}}</span></a-col>
-          </a-row>
-          <a-row class="item-row">
-            <a-col :span="12"><span class="content-label">{{$t('message.fru.board_productname')}}</span></a-col>
-            <a-col :span="12"><span class="courier-bold">{{boardInfo.PrettyName}}</span></a-col>
-          </a-row>
-          <a-row class="item-row">
-            <a-col :span="12"><span class="content-label">{{$t('message.fru.board_serialno')}}</span></a-col>
-            <a-col :span="12"><span class="courier-bold">{{boardInfo.SerialNumber}}</span></a-col>
-          </a-row>
-          <a-row class="item-row">
-            <a-col :span="12"><span class="content-label">{{$t('message.fru.board_partno')}}</span></a-col>
-            <a-col :span="12"><span class="courier-bold">{{boardInfo.PartNumber}}</span></a-col>
-          </a-row>
-        </a-card>
-      </a-col>
-      <a-col :span="8">
-        <a-card :bordered="false" :loading="refreshFlag" :title="$t('message.fru.product')">
-          <a-row class="item-row">
-            <a-col :span="12"><span class="content-label">{{$t('message.fru.product_manufac')}}</span></a-col>
-            <a-col :span="12"><span class="courier-bold">{{productInfo.Manufacturer}}</span></a-col>
-          </a-row>
-          <a-row class="item-row">
-            <a-col :span="12"><span class="content-label">{{$t('message.fru.product_name')}}</span></a-col>
-            <a-col :span="12"><span class="courier-bold">{{productInfo.PrettyName}}</span></a-col>
-          </a-row>
-          <a-row class="item-row">
-            <a-col :span="12"><span class="content-label">{{$t('message.fru.product_partnumber')}}</span></a-col>
-            <a-col :span="12"><span class="courier-bold">{{productInfo.PartNumber}}</span></a-col>
-          </a-row>
-          <a-row class="item-row">
-            <a-col :span="12"><span class="content-label">{{$t('message.fru.product_version')}}</span></a-col>
-            <a-col :span="12"><span class="courier-bold">{{productInfo.Version}}</span></a-col>
-          </a-row>
-          <a-row class="item-row">
-            <a-col :span="12"><span class="content-label">{{$t('message.fru.product_serialno')}}</span></a-col>
-            <a-col :span="12"><span class="courier-bold">{{productInfo.SerialNumber}}</span></a-col>
-          </a-row>
-          <a-row class="item-row">
-            <a-col :span="12"><span class="content-label">{{$t('message.fru.assettag')}}</span></a-col>
-            <a-col :span="12"><span class="courier-bold">{{productInfo.AssetTag}}</span></a-col>
-          </a-row>
-        </a-card>
-      </a-col>
+    <a-row class="item-row">
+      <a-col :span="3">{{$t('message.fru.name')}}</a-col>
+      <a-col :span="10">{{parsedData.name}}</a-col>
     </a-row>
-  </div>
+    <a-row class="item-row">
+      <a-col :span="3">{{$t('message.fru.type')}}</a-col>
+      <a-col :span="10">{{parsedData.type}}</a-col>
+    </a-row>
+    <a-row class="item-row">
+      <a-col :span="3">{{$t('message.fru.vendor')}}</a-col>
+      <a-col :span="10">{{parsedData.vendor}}</a-col>
+    </a-row>
+    <a-row class="item-row">
+      <a-col :span="3">{{$t('message.fru.model')}}</a-col>
+      <a-col :span="10">{{parsedData.model}}</a-col>
+    </a-row>
+    <a-row class="item-row">
+      <a-col :span="3">PN:</a-col>
+      <a-col :span="10">{{parsedData.pn}}</a-col>
+    </a-row>
+    <a-row class="item-row">
+      <a-col :span="3">SN:</a-col>
+      <a-col :span="10">{{parsedData.sn}}</a-col>
+    </a-row>
+    <a-row class="item-row">
+      <a-col :span="3">SKU:</a-col>
+      <a-col :span="10">{{parsedData.sku}}</a-col>
+    </a-row>
+  </view-content>
 </template>
 
 <script>
-import langWatcher from '@/service/mixin/langWatcher'
-import toggleHelp from '@/service/mixin/toggleHelp'
-import refreshWatcher from '@/service/mixin/refreshWatcher'
-import HelpCard from '@/components/helpCard'
+import ViewContent from '@/components/viewContent'
+import { mapMutations } from 'vuex'
 
-import { mapGetters } from 'vuex'
-
-import errorHandler, { getFruInfo } from '@/service/api'
+import http from '@/service/api/http'
+import errorHandler, { getChassisInfo } from '@/service/api'
 
 export default {
   name: 'fru',
-  mixins: [langWatcher, toggleHelp, refreshWatcher],
   data () {
     return {
-      chassisInfo: {},
-      boardInfo: {},
-      productInfo: {}
+      node: undefined,
+      nodeList: [],
+      chassisReqs: {},
+      currentChassisInfo: {},
+      parsedData: {}
     }
   },
-  computed: {
-    ...mapGetters({
-      lang: 'getLang'
-    })
-  },
   methods: {
+    ...mapMutations(['setRefreshFlag']),
     async refresh () {
+      this.nodeList = []
+      this.chassisReqs = {}
       try {
-        let [resChassis, resBoard, resProduct] = await getFruInfo()
-        this.chassisInfo = resChassis.data
-        this.boardInfo = resBoard.data
-        this.productInfo = resProduct.data
+        let resChassis = await getChassisInfo()
+        resChassis.data.Members.forEach((item) => {
+          let tmps = item['@odata.id'].split('/')
+          let name = tmps[tmps.length - 1]
+          this.nodeList.push(name)
+        })
+        this.node = this.nodeList[0]
+        this.chassisReq = `/redfish/v1/Chassis/${this.node}`
+        let resCurrentChassis = await http('get', this.chassisReq)
+        this.parsedData = this.parseData(resCurrentChassis.data)
       } catch (error) {
-        errorHandler(this, error, this.$t('message.fru.get_err_msg'))
+        errorHandler(this, error, this.$t('message.sensor.get_err_msg'))
       }
 
       this.setRefreshFlag({ refreshFlag: false })
+    },
+
+    parseData (content) {
+      return {
+        name: content.Name,
+        type: content.ChassisType,
+        vendor: content.Manufacturer,
+        model: content.Model,
+        pn: content.PartNumber,
+        sn: content.SerialNumber,
+        sku: content.SKU
+      }
+    },
+
+    // chassis变化回调函数
+    async onChassisChange (val) {
+      try {
+        let resCurrentChassis = await http('get', `/redfish/v1/Chassis/${val}`)
+        this.parsedData = this.parseData(resCurrentChassis.data)
+      } catch (error) {
+        errorHandler(this, error, this.$t('message.sensor.get_err_msg'))
+      }
     }
   },
   components: {
-    HelpCard
+    ViewContent
   }
 }
 </script>

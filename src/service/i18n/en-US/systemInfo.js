@@ -2,8 +2,9 @@ export default {
   title: 'System Information',
   sub_title: 'System device asset information list',
   cpu: 'CPU',
+  thead_name: 'Name',
   thead_model: 'Model',
-  thead_status: 'Status',
+  thead_status: 'Health Status',
   thead_speed: 'Speed(Mhz)',
   thead_core: 'Core',
   thead_tdp: 'TDP(W)',
@@ -26,6 +27,7 @@ export default {
   voltage: 'Voltage',
   power_consumption: 'Power Consumption',
 
+  get_err_msg: 'Failed to get system inventory information',
   helpMsg: `This page shows Asset and Status Information of System. You can get different device information in related TAB. Include:
             CPU,memory,psu,fan,temperature,voltage and power consumption.`
 }
