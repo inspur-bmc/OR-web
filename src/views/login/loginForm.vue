@@ -83,6 +83,8 @@ export default {
     userPsw (val) {
       if (val) {
         this.userPswError = 'success'
+      } else {
+        this.userNameError = 'error'
       }
     }
   },
@@ -128,7 +130,7 @@ export default {
         await LOGIN(data)
         this.loadingFlag = false
         localStorage.setItem('username', this.userName)
-        this.$router.push({ path: '/sensor' })
+        this.$router.push({ path: '/system-info' })
       } catch (error) {
         errorHandler(this, error, this.$t('message.signin.login_err_msg'))
         this.loadingFlag = false

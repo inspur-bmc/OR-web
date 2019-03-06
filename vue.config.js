@@ -13,7 +13,7 @@ module.exports = {
     public: '0.0.0.0:23333',
     proxy: {
       '/redfish/v1': {
-        target: 'https://100.2.76.178',
+        target: 'https://100.2.76.86',
         ws: true,
         secure: false,
         cookieDomainRewrite: 'localhost',

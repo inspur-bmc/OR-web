@@ -3,6 +3,7 @@ export * from './firmwareUpdate'
 export * from './login'
 export * from './redfish'
 export * from './inventory'
+export * from './fru'
 
 const msgCodes = [400, 401, 403, 415]
 

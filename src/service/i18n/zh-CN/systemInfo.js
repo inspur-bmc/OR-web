@@ -1,5 +1,5 @@
 export default {
-  title: '系统信息',
+  title: '资产信息',
   sub_title: '系统设备资产信息列表',
   cpu: 'CPU',
   thead_name: '名称',

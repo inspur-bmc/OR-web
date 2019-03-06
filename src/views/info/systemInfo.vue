@@ -5,7 +5,7 @@
         <a-col :span="24">
           <a-form-item :label="$t('message.common.select_node')" :labelCol="{ span: 3 }" :wrapperCol="{ span: 4 }">
             <a-select v-model="system" @change="onSystemChange">
-              <a-select-option v-for="(item, index) in systemList" :key="index" :value="item">{{item}}</a-select-option>
+            <a-select-option v-for="(item, index) in systemList" :key="index" :value="item">{{'node ' + index}}</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>

@@ -8,11 +8,11 @@
           <template slot="title">
             <span>{{$t('message.common.help')}}</span>
           </template>
-          <span class="help-mark"><a-icon type="question-circle" @click="toggleHelp"/></span>
+          <!-- <span class="help-mark"><a-icon type="question-circle" @click="toggleHelp"/></span> -->
         </a-tooltip>
       </a-col>
     </a-row>
-    <help-card :helpFlag="helpFlag">{{$t(`message.${message}.helpMsg`)}}</help-card>
+    <!-- <help-card :helpFlag="helpFlag">{{$t(`message.${message}.helpMsg`)}}</help-card> -->
     <a-row>
       <a-col :span="24">
         <a-card :bordered="false" :loading="refreshFlag">

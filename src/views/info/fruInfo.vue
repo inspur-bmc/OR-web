@@ -1,44 +1,66 @@
 <template>
   <view-content message="fru" @refresh="refresh">
-    <a-row style="margin-bottom: 20px">
-      <a-form>
-        <a-col :span="24">
-          <a-form-item :label="$t('message.common.select_node')" :labelCol="{ span: 3 }" :wrapperCol="{ span: 4 }">
-            <a-select v-model="node" @change="onChassisChange">
-              <a-select-option v-for="(item, index) in nodeList" :key="index" :value="item">{{item}}</a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-col>
-      </a-form>
-    </a-row>
-    <a-row class="item-row">
-      <a-col :span="3">{{$t('message.fru.name')}}</a-col>
-      <a-col :span="10">{{parsedData.name}}</a-col>
-    </a-row>
-    <a-row class="item-row">
-      <a-col :span="3">{{$t('message.fru.type')}}</a-col>
-      <a-col :span="10">{{parsedData.type}}</a-col>
-    </a-row>
-    <a-row class="item-row">
-      <a-col :span="3">{{$t('message.fru.vendor')}}</a-col>
-      <a-col :span="10">{{parsedData.vendor}}</a-col>
-    </a-row>
-    <a-row class="item-row">
-      <a-col :span="3">{{$t('message.fru.model')}}</a-col>
-      <a-col :span="10">{{parsedData.model}}</a-col>
-    </a-row>
-    <a-row class="item-row">
-      <a-col :span="3">PN:</a-col>
-      <a-col :span="10">{{parsedData.pn}}</a-col>
-    </a-row>
-    <a-row class="item-row">
-      <a-col :span="3">SN:</a-col>
-      <a-col :span="10">{{parsedData.sn}}</a-col>
-    </a-row>
-    <a-row class="item-row">
-      <a-col :span="3">SKU:</a-col>
-      <a-col :span="10">{{parsedData.sku}}</a-col>
-    </a-row>
+    <a-tabs tabPosition="left">
+      <a-tab-pane tab="Rack" key="rack">
+        <a-row class="item-row">
+          <a-col :span="3">{{$t('message.fru.name')}}</a-col>
+          <a-col :span="10">{{rackFruInfo.name}}</a-col>
+        </a-row>
+        <a-row class="item-row">
+          <a-col :span="3">{{$t('message.fru.model')}}</a-col>
+          <a-col :span="10">{{rackFruInfo.model}}</a-col>
+        </a-row>
+        <a-row class="item-row">
+          <a-col :span="3">{{$t('message.fru.vendor')}}</a-col>
+          <a-col :span="10">{{rackFruInfo.vendor}}</a-col>
+        </a-row>
+        <a-row class="item-row">
+          <a-col :span="3">{{$t('message.fru.fw_version')}}</a-col>
+          <a-col :span="10">{{rackFruInfo.fwVersion}}</a-col>
+        </a-row>
+      </a-tab-pane>
+      <a-tab-pane :tab="$t('message.fru.node')" key="node">
+        <a-row style="margin-bottom: 20px">
+          <a-form>
+            <a-col :span="24">
+              <a-form-item :label="$t('message.common.select_node')" :labelCol="{ span: 3 }" :wrapperCol="{ span: 4 }">
+                <a-select v-model="node" @change="onChassisChange">
+                  <a-select-option v-for="(item, index) in nodeList" :key="index" :value="item">{{'node ' + index}}</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+          </a-form>
+        </a-row>
+        <a-row class="item-row">
+          <a-col :span="3">{{$t('message.fru.name')}}</a-col>
+          <a-col :span="10">{{parsedData.name}}</a-col>
+        </a-row>
+        <a-row class="item-row">
+          <a-col :span="3">{{$t('message.fru.type')}}</a-col>
+          <a-col :span="10">{{parsedData.type}}</a-col>
+        </a-row>
+        <a-row class="item-row">
+          <a-col :span="3">{{$t('message.fru.vendor')}}</a-col>
+          <a-col :span="10">{{parsedData.vendor}}</a-col>
+        </a-row>
+        <a-row class="item-row">
+          <a-col :span="3">{{$t('message.fru.model')}}</a-col>
+          <a-col :span="10">{{parsedData.model}}</a-col>
+        </a-row>
+        <a-row class="item-row">
+          <a-col :span="3">PN:</a-col>
+          <a-col :span="10">{{parsedData.pn}}</a-col>
+        </a-row>
+        <a-row class="item-row">
+          <a-col :span="3">SN:</a-col>
+          <a-col :span="10">{{parsedData.sn}}</a-col>
+        </a-row>
+        <a-row class="item-row">
+          <a-col :span="3">SKU:</a-col>
+          <a-col :span="10">{{parsedData.sku}}</a-col>
+        </a-row>
+      </a-tab-pane>
+    </a-tabs>
   </view-content>
 </template>
 
@@ -47,7 +69,7 @@ import ViewContent from '@/components/viewContent'
 import { mapMutations } from 'vuex'
 
 import http from '@/service/api/http'
-import errorHandler, { getChassisInfo } from '@/service/api'
+import errorHandler, { getChassisInfo, getRmcFru } from '@/service/api'
 
 export default {
   name: 'fru',
@@ -57,7 +79,8 @@ export default {
       nodeList: [],
       chassisReqs: {},
       currentChassisInfo: {},
-      parsedData: {}
+      parsedData: {},
+      rackFruInfo: {}
     }
   },
   methods: {
@@ -66,6 +89,8 @@ export default {
       this.nodeList = []
       this.chassisReqs = {}
       try {
+        let resRack = await getRmcFru()
+        this.rackFruInfo = this.parseRackData(resRack.data)
         let resChassis = await getChassisInfo()
         resChassis.data.Members.forEach((item) => {
           let tmps = item['@odata.id'].split('/')
@@ -92,6 +117,15 @@ export default {
         pn: content.PartNumber,
         sn: content.SerialNumber,
         sku: content.SKU
+      }
+    },
+
+    parseRackData (content) {
+      return {
+        name: content.Name,
+        model: content.Model,
+        vendor: 'Inspur',
+        fwVersion: content.FirmwareVersion
       }
     },
 

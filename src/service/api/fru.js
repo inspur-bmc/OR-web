@@ -11,3 +11,5 @@ export let getFruInfo = () => {
     getProductInfo()
   ])
 }
+
+export let getRmcFru = () => http('get', '/redfish/v1/Managers/rmc')

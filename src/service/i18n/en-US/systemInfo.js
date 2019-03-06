@@ -1,5 +1,5 @@
 export default {
-  title: 'System Information',
+  title: 'System Inventory Information',
   sub_title: 'System device asset information list',
   cpu: 'CPU',
   thead_name: 'Name',
