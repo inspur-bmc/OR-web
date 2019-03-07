@@ -29,6 +29,11 @@
           <span>{{$t('message.common.sensorInfo')}}</span>
         </router-link>
       </a-menu-item>
+      <a-menu-item key="psu" :disabled="fwUpdateState">
+        <router-link to="psu"><a-icon type="api" />
+          <span>{{$t('message.common.psuInfo')}}</span>
+        </router-link>
+      </a-menu-item>
       <a-menu-item key="fanCtrl" :disabled="fwUpdateState">
         <router-link to="fan-controller"><span class="iconfont icon-fan" />
           <span>{{$t('message.common.fan_controller')}}</span>

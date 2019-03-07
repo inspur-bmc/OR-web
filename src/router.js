@@ -8,6 +8,7 @@ import RedfishRoute from './views/redfish/route'
 import SensorRoute from './views/sensor/route'
 import FwUpdateRoute from './views/fwUpdate/route'
 import NodeInfoRoute from './views/node/route'
+import PsuRoute from './views/psu/route'
 
 Vue.use(Router)
 
@@ -21,6 +22,7 @@ export default new Router({
     ...RedfishRoute,
     ...SensorRoute,
     ...FwUpdateRoute,
-    ...NodeInfoRoute
+    ...NodeInfoRoute,
+    ...PsuRoute
   ]
 })

@@ -7,6 +7,7 @@ import FwUpdateMsg from './fwUpdate'
 import RedfishMsg from './redfish'
 import SensorMsg from './sensor'
 import NodeMsg from './node'
+import PsuMsg from './psu'
 
 export default {
   message: {
@@ -18,6 +19,7 @@ export default {
     fwUpdate: FwUpdateMsg,
     redfish: RedfishMsg,
     sensor: SensorMsg,
-    node: NodeMsg
+    node: NodeMsg,
+    psu: PsuMsg
   }
 }

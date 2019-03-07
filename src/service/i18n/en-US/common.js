@@ -20,6 +20,7 @@ export default {
   sysInfo: 'System Info',
   fruInfo: 'FRU Info',
   nodeInfo: 'Node Info',
+  psuInfo: 'PSU Module',
   select_node: 'Select Node',
   firmware_update: 'Firmware Update',
   power_on: 'Power On',

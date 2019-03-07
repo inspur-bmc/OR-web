@@ -20,6 +20,7 @@ export default {
   sysInfo: '系统信息',
   fruInfo: 'FRU信息',
   nodeInfo: '节点信息',
+  psuInfo: '电源模块',
   select_node: '请选择节点',
   firmware_update: '固件更新',
   power_on: '开机',
